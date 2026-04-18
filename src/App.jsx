@@ -26,6 +26,11 @@ function App() {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
+      
+      // If a user just logged in, always start them on the dashboard
+      if (currentUser) {
+        handleTabChange('dashboard');
+      }
     });
     return () => unsubscribe();
   }, []);
