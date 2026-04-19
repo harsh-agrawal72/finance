@@ -222,7 +222,7 @@ const SavingsGamified = ({ goals, addGoal, deleteGoal, depositToGoal, withdrawFr
                   <button onClick={() => setEditingGoal({ ...goal })} style={{ padding: '5px 7px', background: 'rgba(0,242,255,0.08)', border: '1px solid rgba(0,242,255,0.18)', borderRadius: '8px', color: 'var(--accent-cyan)', cursor: 'pointer', display: 'flex' }}>
                     <Edit2 size={13} />
                   </button>
-                  <button onClick={() => deleteGoal(goal.id)} style={{ padding: '5px 7px', background: 'rgba(255,77,77,0.08)', border: '1px solid rgba(255,77,77,0.18)', borderRadius: '8px', color: 'var(--danger)', cursor: 'pointer', display: 'flex' }}>
+                  <button onClick={() => { if (window.confirm('Are you sure you want to delete this goal? All progress will be lost.')) deleteGoal(goal.id); }} style={{ padding: '5px 7px', background: 'rgba(255,77,77,0.08)', border: '1px solid rgba(255,77,77,0.18)', borderRadius: '8px', color: 'var(--danger)', cursor: 'pointer', display: 'flex' }}>
                     <X size={13} />
                   </button>
                 </div>

@@ -342,7 +342,7 @@ const TransactionManager = ({ transactions, addTransaction, deleteTransaction, e
                       style={{ flex: isMobile ? 1 : 'none', padding: '8px 12px', background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.2)', borderRadius: '8px', color: 'var(--info)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '12px', fontWeight: 600 }}>
                       <Edit2 size={13} /> {isMobile && 'Edit'}
                     </button>
-                    <button onClick={() => deleteTransaction(t.id)}
+                    <button onClick={() => { if (window.confirm('Delete this transaction?')) deleteTransaction(t.id); }}
                       style={{ flex: isMobile ? 1 : 'none', padding: '8px 12px', background: 'rgba(255,77,77,0.1)', border: '1px solid rgba(255,77,77,0.2)', borderRadius: '8px', color: 'var(--danger)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '12px', fontWeight: 600 }}>
                       <Trash2 size={13} /> {isMobile && 'Delete'}
                     </button>

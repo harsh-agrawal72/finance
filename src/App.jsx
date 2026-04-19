@@ -132,6 +132,8 @@ function App() {
           getNetWorth={finance.getNetWorth}
           askAI={finance.askAI}
           transactions={data.transactions}
+          goals={data.goals}
+          assets={data.assets}
         />;
       case 'networth':
         return <NetWorth
@@ -146,6 +148,7 @@ function App() {
         />;
       case 'settings':
         return <Settings
+          user={user}
           data={data}
           currency={data.currency}
           updateSettings={finance.updateSettings}

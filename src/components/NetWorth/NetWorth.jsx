@@ -145,7 +145,7 @@ const NetWorth = ({ assets, liabilities, addAsset, deleteAsset, addLiability, de
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <p style={{ fontWeight: 800, fontSize: '15px', color: 'var(--accent-emerald)' }}>{currency}{Number(a.value).toLocaleString()}</p>
-                  <button onClick={() => deleteAsset(a.id)}
+                  <button onClick={() => { if (window.confirm('Delete this asset?')) deleteAsset(a.id); }}
                     style={{ padding: '5px', background: 'rgba(255,77,77,0.08)', border: '1px solid rgba(255,77,77,0.15)', borderRadius: '7px', color: 'var(--danger)', cursor: 'pointer', display: 'flex' }}>
                     <Trash2 size={13} />
                   </button>
@@ -193,7 +193,7 @@ const NetWorth = ({ assets, liabilities, addAsset, deleteAsset, addLiability, de
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <p style={{ fontWeight: 800, fontSize: '15px', color: 'var(--danger)' }}>{currency}{Number(l.value).toLocaleString()}</p>
-                  <button onClick={() => deleteLiability(l.id)}
+                  <button onClick={() => { if (window.confirm('Delete this liability?')) deleteLiability(l.id); }}
                     style={{ padding: '5px', background: 'rgba(255,77,77,0.08)', border: '1px solid rgba(255,77,77,0.15)', borderRadius: '7px', color: 'var(--danger)', cursor: 'pointer', display: 'flex' }}>
                     <Trash2 size={13} />
                   </button>

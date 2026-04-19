@@ -16,6 +16,7 @@ const Analytics = ({
   userName,
   monthlyHistory, categoryBreakdown, totals, getAnomalies,
   getSpendingForecast, getRecurringExpenses, getNetWorth, askAI, transactions,
+  goals = [], assets = [],
   currency = '₹'
 }) => {
   const [activeSection, setActiveSection] = useState('overview');
@@ -99,12 +100,23 @@ const Analytics = ({
     datasets: [{
       label: 'Your Score',
       data: [
+        // 1. Savings Rate (Target: 20%+)
         Math.max(0, Math.min(100, totals.savingsRate * 5)),
+        
+        // 2. Budget Control (Efficiency of spending)
         Math.max(0, 100 - Math.round((totals.expenses / Math.max(totals.income, 1)) * 100)),
+        
+        // 3. Low Debt (Debt to Asset ratio)
         Math.max(0, 100 - Math.round((netWorthData.totalLiabilities / Math.max(netWorthData.totalAssets, 1)) * 100)),
-        Math.min(100, 60),
-        50,
-        Math.min(100, 40),
+        
+        // 4. Goal Progress (Average completion %)
+        Math.round((goals.reduce((s, g) => s + Number(g.current), 0) / Math.max(goals.reduce((s, g) => s + Number(g.target), 0), 1)) * 100),
+        
+        // 5. Income Diversity (Number of sources)
+        Math.min(100, Array.from(new Set(transactions.filter(t => t.type === 'income').map(t => t.category))).length * 25),
+        
+        // 6. Emergency Fund (Months of coverage, Target: 6 months)
+        Math.min(100, Math.round(((assets.filter(a => a.type === 'liquid').reduce((s, a) => s + Number(a.value), 0)) / Math.max(totals.expenses, 1)) * 16.6)),
       ],
       borderColor: '#00f2ff',
       backgroundColor: 'rgba(0,242,255,0.12)',

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { User, DollarSign, Bell, Download, Upload, RefreshCw, Trash2, Check, Plus, X, Palette } from 'lucide-react';
+import { User, DollarSign, Bell, Download, Upload, RefreshCw, Trash2, Check, Plus, X, Palette, Mail, Calendar, ShieldCheck, ShieldAlert, LogIn } from 'lucide-react';
 
 const CARD  = { background: 'rgba(15,23,42,0.45)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '20px', padding: '28px' };
 const INPUT = { padding: '11px 14px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: 'var(--text-primary)', borderRadius: '10px', outline: 'none', fontFamily: 'inherit', fontSize: '14px', boxSizing: 'border-box', width: '100%' };
 const LABEL = { fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '6px' };
 const BTN   = (color='var(--accent-cyan)') => ({ padding: '10px 18px', background: `${color}15`, border: `1px solid ${color}30`, color, borderRadius: '10px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '7px', transition: 'all 0.2s' });
 
-const Settings = ({ data, updateSettings, categories, addCategory, exportJSON, importJSON, resetData, importFromLocal }) => {
+const Settings = ({ user, data, updateSettings, categories, addCategory, exportJSON, importJSON, resetData, importFromLocal }) => {
   const [profile, setProfile]     = useState({ userName: data.userName || '', currency: data.currency || '₹' });
   const [saved, setSaved]         = useState(false);
   const [newCategory, setNewCat]  = useState({ type: 'expense', name: '' });
@@ -81,22 +81,84 @@ const Settings = ({ data, updateSettings, categories, addCategory, exportJSON, i
 
       {/* ── Profile ─────────────────────────────────────────────────────── */}
       <Section title="Profile & Preferences" icon={User} color="var(--accent-cyan)">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px', marginBottom: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '20px', marginBottom: '24px' }}>
           <div>
-            <label style={LABEL}>Your Name</label>
-            <input value={profile.userName} onChange={e => setProfile(p => ({ ...p, userName: e.target.value }))} placeholder="Enter your name" style={INPUT} />
+            <label style={LABEL}>Display Name</label>
+            <div style={{ position: 'relative' }}>
+              <User size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+              <input 
+                value={profile.userName} 
+                onChange={e => setProfile(p => ({ ...p, userName: e.target.value }))} 
+                placeholder="Enter your name" 
+                style={{ ...INPUT, paddingLeft: '36px' }} 
+              />
+            </div>
+          </div>
+          <div>
+            <label style={LABEL}>Email Address</label>
+            <div style={{ position: 'relative' }}>
+              <Mail size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+              <input 
+                value={user?.email || 'N/A'} 
+                readOnly 
+                style={{ ...INPUT, paddingLeft: '36px', opacity: 0.7, cursor: 'not-allowed', background: 'rgba(255,255,255,0.02)' }} 
+              />
+            </div>
+            <p style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px' }}>Your sign-up email (cannot be changed)</p>
           </div>
           <div>
             <label style={LABEL}>Currency Symbol</label>
-            <select value={profile.currency} onChange={e => setProfile(p => ({ ...p, currency: e.target.value }))}
-              style={{ ...INPUT, cursor: 'pointer' }}>
-              {CURRENCY_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
+            <div style={{ position: 'relative' }}>
+              <DollarSign size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+              <select 
+                value={profile.currency} 
+                onChange={e => setProfile(p => ({ ...p, currency: e.target.value }))}
+                style={{ ...INPUT, paddingLeft: '36px', cursor: 'pointer' }}
+              >
+                {CURRENCY_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+          </div>
+          {user?.metadata?.creationTime && (
+            <div>
+              <label style={LABEL}>Member Since</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '11px 14px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <Calendar size={14} style={{ color: 'var(--accent-cyan)' }} />
+                <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+                  {new Date(user.metadata.creationTime).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                </span>
+              </div>
+            </div>
+          )}
+          <div>
+            <label style={LABEL}>Account Status</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '11px 14px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
+              {user?.emailVerified ? (
+                <>
+                  <ShieldCheck size={14} style={{ color: 'var(--accent-emerald)' }} />
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--accent-emerald)', textTransform: 'uppercase' }}>Verified</span>
+                </>
+              ) : (
+                <>
+                  <ShieldAlert size={14} style={{ color: 'var(--danger)' }} />
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--danger)', textTransform: 'uppercase' }}>Unverified</span>
+                </>
+              )}
+            </div>
+          </div>
+          <div>
+            <label style={LABEL}>Sign-in Method</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '11px 14px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <LogIn size={14} style={{ color: 'var(--accent-violet)' }} />
+              <span style={{ fontSize: '14px', color: 'var(--text-secondary)', textTransform: 'capitalize' }}>
+                {user?.providerData?.[0]?.providerId?.replace('.com', '') || 'Password'}
+              </span>
+            </div>
           </div>
         </div>
         <button onClick={handleSaveProfile}
           style={{ ...BTN('var(--accent-emerald)'), background: saved ? 'rgba(0,255,170,0.15)' : 'rgba(0,255,170,0.08)', border: `1px solid ${saved ? 'rgba(0,255,170,0.5)' : 'rgba(0,255,170,0.2)'}` }}>
-          <Check size={15} /> {saved ? 'Saved!' : 'Save Profile'}
+          <Check size={15} /> {saved ? 'Saved Successfully!' : 'Save Changes'}
         </button>
       </Section>
 

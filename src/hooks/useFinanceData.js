@@ -370,9 +370,73 @@ export const useFinanceData = (uid) => {
   const getAIInsights = useCallback(() => aiInsights, [aiInsights]);
 
   const askAI = useCallback((question) => {
-    // Placeholder AI chat logic - can be expanded to use real LLM later
-    return "I'm your Ledzo Finance AI. I see your current savings rate is " + totals.savingsRate + "%. Keep tracking to get more insights!";
-  }, [totals]);
+    const q = question.toLowerCase();
+    
+    // ─── 1. SAFE TO SPEND / BUDGET LIMITS ───────────────────────────────
+    if (q.includes('spend') || q.includes('limit') || q.includes('can i') || q.includes('budget')) {
+      const { safeToSpend, projected, dailyRate } = spendingForecast;
+      if (safeToSpend > 0) {
+        return {
+          text: `Based on your current income and spending pace, you have **${data.currency}${safeToSpend.toLocaleString()}** safe to spend for the rest of the month. Your daily burn rate is about **${data.currency}${dailyRate.toLocaleString()}**. If you stick to this, you'll end the month with a surplus!`,
+          suggestions: ['Will I overspend?', 'Show my category breakdown', 'How much should I save?']
+        };
+      } else {
+        return {
+          text: `It looks like your projected spending (**${data.currency}${projected.toLocaleString()}**) is exceeding your income (**${data.currency}${totals.income.toLocaleString()}**). I recommend cutting back on non-essential categories to avoid a deficit.`,
+          suggestions: ['Where am I overspending?', 'List my subscriptions', 'Budgeting tips']
+        };
+      }
+    }
+
+    // ─── 2. BALANCE / NET WORTH ──────────────────────────────────────────
+    if (q.includes('balance') || q.includes('net worth') || q.includes('money') || q.includes('status')) {
+      const { netWorth: nw, totalAssets, totalLiabilities } = netWorth;
+      return {
+        text: `Your current net worth is **${data.currency}${nw.toLocaleString()}**. \n\n• **Total Assets:** ${data.currency}${totalAssets.toLocaleString()}\n• **Total Liabilities:** ${data.currency}${totalLiabilities.toLocaleString()}\n\nYour monthly cash flow (income vs expense) is currently at **${data.currency}${totals.balance.toLocaleString()}**.`,
+        suggestions: ['How to increase net worth?', 'Show my assets', 'Investment tips']
+      };
+    }
+
+    // ─── 3. CATEGORY SPECIFIC SEARCH ─────────────────────────────────────
+    const allCategories = [...data.categories.income, ...data.categories.expense];
+    const foundCat = allCategories.find(c => q.includes(c.toLowerCase()));
+    if (foundCat) {
+      const catData = categoryBreakdown.find(c => c.name.toLowerCase() === foundCat.toLowerCase());
+      const amount = catData ? catData.amount : 0;
+      return {
+        text: `You have spent **${data.currency}${amount.toLocaleString()}** on **${foundCat}** so far this month. \n\n${amount > 0 ? "Would you like to see the transactions for this category?" : "You haven't recorded any transactions in this category yet."}`,
+        suggestions: [`Show all ${foundCat} transactions`, 'Compare to last month', 'Set a budget for this']
+      };
+    }
+
+    // ─── 4. RECURRING / SUBSCRIPTIONS ────────────────────────────────────
+    if (q.includes('subscription') || q.includes('recurring') || q.includes('bill') || q.includes('monthly')) {
+      const totalRecurring = recurringExpenses.reduce((s, t) => s + Number(t.amount), 0);
+      return {
+        text: `You have **${recurringExpenses.length}** active recurring items totaling **${data.currency}${totalRecurring.toLocaleString()}** per month. \n\nAnnually, this costs you **${data.currency}${(totalRecurring * 12).toLocaleString()}**.`,
+        suggestions: ['List all subscriptions', 'Identify unused subs', 'How to save on bills']
+      };
+    }
+
+    // ─── 5. SAVINGS / INVESTMENT ADVICE ──────────────────────────────────
+    if (q.includes('save') || q.includes('saving') || q.includes('invest') || q.includes('goal')) {
+      const { savingsRate } = totals;
+      let advice = "";
+      if (savingsRate >= 20) advice = "You're doing great! Your savings rate is above the 20% benchmark.";
+      else advice = "Try to aim for a 20% savings rate. Reviewing your non-essential spending could help.";
+      
+      return {
+        text: `${advice} Your current rate is **${savingsRate}%**. You have **${data.goals.length}** active savings goals.`,
+        suggestions: ['Show my goals', 'How much to save for emergency?', 'Investment 101']
+      };
+    }
+
+    // ─── DEFAULT FALLBACK ────────────────────────────────────────────────
+    return {
+      text: `I'm your **Ledzo AI Advisor**. I can analyze your transactions, forecast your month-end, and help with budgeting. \n\nTry asking: *"Will I overspend?"* or *"How much spent on food?"*`,
+      suggestions: ['Will I overspend?', 'How much I have to spend?', 'Show insights']
+    };
+  }, [totals, data.currency, data.categories, data.goals, spendingForecast, netWorth, categoryBreakdown, recurringExpenses]);
 
   return {
     data, loading,

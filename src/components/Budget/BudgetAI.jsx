@@ -7,7 +7,7 @@ import { Doughnut } from 'react-chartjs-2';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 // ─── BudgetProgress Component (Defined outside to prevent focus loss) ────────
-const BudgetProgress = memo(({ title, current, target, suggested, icon: Icon, color, delay, onSaveBudget, currency = '₹' }) => {
+const BudgetProgress = memo(({ title, current, target, suggested, icon: Icon, color, delay, onSaveBudget, currency = '₹', isInverse = false }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [tempValue, setTempValue] = useState(target);
 
@@ -18,14 +18,17 @@ const BudgetProgress = memo(({ title, current, target, suggested, icon: Icon, co
   };
 
   const percentage = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0;
-  const isOver = target > 0 && current > target;
+  // For normal budgets (needs/wants), current > target is bad.
+  // For inverse budgets (savings), current > target is good.
+  const isExceeded = target > 0 && current > target;
+  const isNegative = isInverse ? (target > 0 && current < target) : isExceeded;
   const remaining = Math.max(0, target - current);
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay, duration: 0.5 }}
-      className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '24px', border: `1px solid ${isOver ? 'rgba(255,77,77,0.3)' : 'var(--glass-border)'}`, position: 'relative', overflow: 'hidden', padding: '28px' }}>
+      className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '24px', border: `1px solid ${isNegative ? (isInverse ? 'rgba(245,158,11,0.3)' : 'rgba(255,77,77,0.3)') : 'var(--glass-border)'}`, position: 'relative', overflow: 'hidden', padding: '28px' }}>
 
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: isOver ? 'var(--danger)' : color, opacity: 0.8 }} />
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: isNegative ? (isInverse ? 'var(--warning)' : 'var(--danger)') : (isInverse && isExceeded ? 'var(--accent-cyan)' : color), opacity: 0.8 }} />
 
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
@@ -35,7 +38,7 @@ const BudgetProgress = memo(({ title, current, target, suggested, icon: Icon, co
           </div>
           <div>
             <h3 style={{ fontWeight: 800, fontSize: '22px', letterSpacing: '-0.5px', marginBottom: '4px' }}>{title}</h3>
-            <span style={{ fontSize: '10.5px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1.2px', opacity: 0.8 }}>Budget Limit</span>
+            <span style={{ fontSize: '10.5px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1.2px', opacity: 0.8 }}>{isInverse ? 'Savings Target' : 'Budget Limit'}</span>
           </div>
         </div>
 
@@ -59,7 +62,7 @@ const BudgetProgress = memo(({ title, current, target, suggested, icon: Icon, co
               </button>
             </div>
           )}
-          <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 600, background: 'rgba(255,255,255,0.03)', padding: '4px 10px', borderRadius: '8px' }}>{currency}{current.toLocaleString()} spent</span>
+          <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 600, background: 'rgba(255,255,255,0.03)', padding: '4px 10px', borderRadius: '8px' }}>{currency}{current.toLocaleString()} saved</span>
         </div>
       </div>
 
@@ -67,21 +70,40 @@ const BudgetProgress = memo(({ title, current, target, suggested, icon: Icon, co
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '8px' }}>
         <div style={{ height: '14px', background: 'var(--bg-secondary)', borderRadius: '7px', overflow: 'hidden', border: '1px solid var(--glass-border)', padding: '2px' }}>
           <motion.div initial={{ width: 0 }} animate={{ width: `${target === 0 ? 0 : percentage}%` }} transition={{ delay: delay + 0.3, duration: 1.2, ease: 'easeOut' }}
-            style={{ height: '100%', background: isOver ? 'var(--danger)' : color, boxShadow: `0 0 15px ${isOver ? 'var(--danger)' : color}60`, borderRadius: '5px' }} />
+            style={{ height: '100%', background: isNegative ? (isInverse ? 'var(--warning)' : 'var(--danger)') : (isInverse && isExceeded ? 'var(--accent-cyan)' : color), boxShadow: `0 0 15px ${isNegative ? (isInverse ? 'var(--warning)' : 'var(--danger)') : color}60`, borderRadius: '5px' }} />
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11.5px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
-          <span style={{ color: isOver ? 'var(--danger)' : 'inherits', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            {isOver && <AlertCircle size={12} />} {target === 0 ? 'Not set' : `${percentage}% used`}
+          <span style={{ color: isNegative ? (isInverse ? 'var(--warning)' : 'var(--danger)') : (isInverse && isExceeded ? 'var(--accent-cyan)' : 'inherit'), display: 'flex', alignItems: 'center', gap: '4px' }}>
+            {isNegative && !isInverse && <AlertCircle size={12} />} {target === 0 ? 'Not set' : `${percentage}% achieved`}
           </span>
-          <span style={{ color: isOver ? 'var(--danger)' : 'var(--text-secondary)' }}>{isOver ? `${currency}${(current - target).toLocaleString()} OVER LIMIT!` : target === 0 ? `${currency}${current.toLocaleString()} tracked` : `${currency}${remaining.toLocaleString()} left`}</span>
+          <span style={{ color: isNegative ? (isInverse ? 'var(--warning)' : 'var(--danger)') : (isInverse && isExceeded ? 'var(--accent-cyan)' : 'var(--text-secondary)') }}>
+            {isInverse 
+              ? (isExceeded ? `BONUS ${currency}${(current - target).toLocaleString()} SAVED! 🚀` : `${currency}${remaining.toLocaleString()} more to reach target`)
+              : (isExceeded ? `${currency}${(current - target).toLocaleString()} OVER LIMIT!` : target === 0 ? `${currency}${current.toLocaleString()} tracked` : `${currency}${remaining.toLocaleString()} left`)
+            }
+          </span>
         </div>
       </div>
 
       {/* Footer: status + calibrate */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '20px', borderTop: '1px solid var(--glass-border)', marginTop: '4px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '24px', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.8px', background: isOver ? 'rgba(255,77,77,0.12)' : 'rgba(34,197,94,0.12)', color: isOver ? 'var(--danger)' : 'var(--success)', border: `1px solid ${isOver ? 'rgba(255,77,77,0.2)' : 'rgba(34,197,94,0.2)'}` }}>
+        <div style={{ 
+          display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '24px', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.8px', 
+          background: isInverse 
+            ? (isExceeded ? 'rgba(0,242,255,0.12)' : (percentage >= 80 ? 'rgba(34,197,94,0.12)' : 'rgba(245,158,11,0.12)')) 
+            : (isExceeded ? 'rgba(255,77,77,0.12)' : 'rgba(34,197,94,0.12)'), 
+          color: isInverse 
+            ? (isExceeded ? 'var(--accent-cyan)' : (percentage >= 80 ? 'var(--success)' : 'var(--warning)'))
+            : (isExceeded ? 'var(--danger)' : 'var(--success)'), 
+          border: `1px solid ${isInverse 
+            ? (isExceeded ? 'rgba(0,242,255,0.2)' : (percentage >= 80 ? 'rgba(34,197,94,0.2)' : 'rgba(245,158,11,0.2)'))
+            : (isExceeded ? 'rgba(255,77,77,0.2)' : 'rgba(34,197,94,0.2)')}` 
+        }}>
           <Zap size={13} fill="currentColor" />
-          {isOver ? 'Over Budget' : 'On Track'}
+          {isInverse 
+            ? (isExceeded ? 'Elite Saver' : (percentage >= 80 ? 'Near Target' : 'Growing')) 
+            : (isExceeded ? 'Over Budget' : 'On Track')
+          }
         </div>
         <button onClick={() => onSaveBudget(title, suggested)}
           style={{ fontSize: '11px', fontWeight: 800, color: 'var(--accent-cyan)', background: 'rgba(0,242,255,0.04)', border: '1px solid rgba(0,242,255,0.15)', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '1.2px', padding: '8px 14px', borderRadius: '10px', transition: 'all 0.2s' }}
@@ -133,7 +155,7 @@ const BudgetAI = ({ totals, budgets, setBudget, currency = '₹' }) => {
       <div className="adaptive-grid" style={{ '--grid-cols': 'repeat(auto-fit, minmax(380px, 1fr))', gap: '24px' }}>
         <BudgetProgress title="Needs" current={needs.spent} target={needs.amount} suggested={suggestedNeeds} icon={AlertCircle} color="var(--accent-cyan)" delay={0} onSaveBudget={handleSaveBudget} currency={currency} />
         <BudgetProgress title="Wants" current={wants.spent} target={wants.amount} suggested={suggestedWants} icon={TrendingUp} color="var(--accent-violet)" delay={0.1} onSaveBudget={handleSaveBudget} currency={currency} />
-        <BudgetProgress title="Savings" current={savings.spent} target={savings.amount} suggested={suggestedSavings} icon={Target} color="var(--accent-emerald)" delay={0.2} onSaveBudget={handleSaveBudget} currency={currency} />
+        <BudgetProgress title="Savings" current={savings.spent} target={savings.amount} suggested={suggestedSavings} icon={Target} color="var(--accent-emerald)" delay={0.2} onSaveBudget={handleSaveBudget} currency={currency} isInverse={true} />
       </div>
 
       {/* Doughnut + Info */}
