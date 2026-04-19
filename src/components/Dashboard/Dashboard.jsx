@@ -6,7 +6,7 @@ import { ArrowUpRight, ArrowDownRight, Wallet, BrainCircuit, TrendingUp, Plus, R
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler);
 
-const Dashboard = ({ totals, healthScore, insights, recentTransactions, addTransaction, categories, monthlyHistory, categoryBreakdown, currency = '₹' }) => {
+const Dashboard = ({ userName, totals, healthScore, insights, recentTransactions, addTransaction, categories, monthlyHistory, categoryBreakdown, currency = '₹' }) => {
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [chartMode, setChartMode] = useState('line');
   const [form, setForm] = useState({ amount: '', category: categories?.expense?.[0] || 'Groceries', description: '', date: new Date().toISOString().split('T')[0], type: 'expense', recurring: 'none', note: '' });
@@ -80,7 +80,7 @@ const Dashboard = ({ totals, healthScore, insights, recentTransactions, addTrans
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <p style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '4px' }}>{new Date().toLocaleDateString('en-IN', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
-          <h1 style={{ fontSize: isMobile ? '28px' : '34px', fontWeight: 800, letterSpacing: '-1px' }}>{greeting()}, Harsh! 👋</h1>
+          <h1 style={{ fontSize: isMobile ? '28px' : '34px', fontWeight: 800, letterSpacing: '-1px' }}>{greeting()}, {userName || 'User'}! 👋</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginTop: '2px' }}>Based on {currency}{totals.income.toLocaleString()} monthly income</p>
         </div>
         <button onClick={() => setShowQuickAdd(v => !v)}

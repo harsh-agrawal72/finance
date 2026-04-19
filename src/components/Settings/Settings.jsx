@@ -38,7 +38,7 @@ const Settings = ({ data, updateSettings, categories, addCategory, exportJSON, i
 
   // Sync local state if data prop changes (e.g. from import or reset)
   React.useEffect(() => {
-    setProfile({ userName: data.userName || 'Harsh', currency: data.currency || '₹' });
+    setProfile({ userName: data.userName || '', currency: data.currency || '₹' });
   }, [data.userName, data.currency]);
 
   const handleAddCategory = (e) => {
@@ -84,7 +84,7 @@ const Settings = ({ data, updateSettings, categories, addCategory, exportJSON, i
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px', marginBottom: '20px' }}>
           <div>
             <label style={LABEL}>Your Name</label>
-            <input value={profile.userName} onChange={e => setProfile(p => ({ ...p, userName: e.target.value }))} placeholder="e.g. Harsh" style={INPUT} />
+            <input value={profile.userName} onChange={e => setProfile(p => ({ ...p, userName: e.target.value }))} placeholder="Enter your name" style={INPUT} />
           </div>
           <div>
             <label style={LABEL}>Currency Symbol</label>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { auth } from '../../firebase';
+import { auth, db } from '../../firebase';
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
@@ -8,6 +8,7 @@ import {
   GoogleAuthProvider,
   updateProfile
 } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 import { Mail, Lock, User, ArrowRight, LogIn } from 'lucide-react';
 
 const Auth = () => {
@@ -29,7 +30,12 @@ const Auth = () => {
       } else {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         await updateProfile(userCredential.user, { displayName: name });
-        // You can add logic to initialize user data in Firestore here
+        
+        // Initialize user document in Firestore with the name
+        await setDoc(doc(db, 'users', userCredential.user.uid), {
+          userName: name,
+          createdAt: new Date().toISOString()
+        });
       }
     } catch (err) {
       console.error(err);

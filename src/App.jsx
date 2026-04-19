@@ -19,7 +19,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(() => {
-    return window.location.hash ? window.location.hash.substring(1) : 'dashboard';
+    return window.location.pathname !== '/' ? window.location.pathname.substring(1) : 'dashboard';
   });
 
   useEffect(() => {
@@ -37,9 +37,11 @@ function App() {
 
   useEffect(() => {
     const handlePopState = () => {
-      const hash = window.location.hash.substring(1);
-      if (hash && hash !== activeTab) {
-        setActiveTab(hash);
+      const path = window.location.pathname.substring(1);
+      if (path && path !== activeTab) {
+        setActiveTab(path);
+      } else if (window.location.pathname === '/') {
+        setActiveTab('dashboard');
       }
     };
     window.addEventListener('popstate', handlePopState);
@@ -48,7 +50,7 @@ function App() {
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-    window.location.hash = tab;
+    window.history.pushState(null, '', `/${tab}`);
   };
 
   const finance = useFinanceData(user?.uid);
@@ -80,6 +82,7 @@ function App() {
     switch (activeTab) {
       case 'dashboard':
         return <Dashboard
+          userName={data.userName}
           totals={finance.getTotals()}
           currency={data.currency}
           healthScore={finance.getHealthScore()}
@@ -118,6 +121,7 @@ function App() {
         />;
       case 'analytics':
         return <Analytics
+          userName={data.userName}
           monthlyHistory={finance.getMonthlyHistory(6)}
           categoryBreakdown={finance.getCategoryBreakdown()}
           totals={finance.getTotals()}

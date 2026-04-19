@@ -31,7 +31,7 @@ const INITIAL_DATA = {
     income: ['Salary', 'Freelance', 'Investments', 'Business', 'Gift', 'Side Hustle', 'Rental Income', 'Bonus'],
     expense: ['Rent', 'Groceries', 'Utilities', 'Dining', 'Transport', 'Entertainment', 'Healthcare', 'Shopping', 'Education', 'Subscriptions', 'Insurance', 'Fuel', 'Personal Care', 'Gifts', 'Misc'],
   },
-  userName: '',
+  userName: 'User',
   currency: '₹',
 };
 
@@ -56,7 +56,7 @@ export const useFinanceData = (uid) => {
           categories: INITIAL_DATA.categories,
           budgets: INITIAL_DATA.budgets,
           userName: INITIAL_DATA.userName
-        });
+        }, { merge: true });
       }
     });
 

@@ -13,6 +13,7 @@ const tickStyle = { color: '#475569', font: { family: 'Outfit', size: 11 } };
 const NEON = ['#00f2ff', '#8b5cf6', '#00ffaa', '#f59e0b', '#d946ef', '#f43f5e', '#0ea5e9', '#22c55e'];
 
 const Analytics = ({
+  userName,
   monthlyHistory, categoryBreakdown, totals, getAnomalies,
   getSpendingForecast, getRecurringExpenses, getNetWorth, askAI, transactions,
   currency = '₹'
@@ -26,7 +27,7 @@ const Analytics = ({
   }, []);
 
   const [chatHistory, setChatHistory] = useState([
-    { role: 'ai', text: "Hi Harsh! I'm your **Personal Finance AI Advisor** 🤖\n\nI'm connected to your real financial data and can give you personalized answers. Try asking me:\n\n• *How much should I spend on food?*\n• *Will I overspend this month?*\n• *Where should I invest?*\n• *How to pay off my debt faster?*", suggestions: ['How much should I spend on food?', 'What is my savings rate?', 'Investment tips for me'] }
+    { role: 'ai', text: `Hi ${userName || 'User'}! I'm your **Personal Finance AI Advisor** 🤖\n\nI'm connected to your real financial data and can give you personalized answers. Try asking me:\n\n• *How much should I spend on food?*\n• *Will I overspend this month?*\n• *Where should I invest?*\n• *How to pay off my debt faster?*`, suggestions: ['How much should I spend on food?', 'What is my savings rate?', 'Investment tips for me'] }
   ]);
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -306,7 +307,7 @@ const Analytics = ({
                       <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600 }}>Online · Analyzing your real data</span>
                     </div>
                   </div>
-                  <button onClick={() => setChatHistory([{ role: 'ai', text: "Hi Harsh! I'm your **Personal Finance AI Advisor** 🤖\n\nI'm connected to your real financial data and can give you personalized answers. Try asking me:\n\n• *How much should I spend on food?*\n• *Will I overspend this month?*\n• *Where should I invest?*\n• *How to pay off my debt faster?*", suggestions: ['How much should I spend on food?', 'What is my savings rate?', 'Investment tips for me'] }])} style={{ marginLeft: 'auto', padding: '7px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', color: 'var(--text-muted)', cursor: 'pointer' }}>
+                  <button onClick={() => setChatHistory([{ role: 'ai', text: `Hi ${userName || 'User'}! I'm your **Personal Finance AI Advisor** 🤖\n\nI'm connected to your real financial data and can give you personalized answers. Try asking me:\n\n• *How much should I spend on food?*\n• *Will I overspend this month?*\n• *Where should I invest?*\n• *How to pay off my debt faster?*`, suggestions: ['How much should I spend on food?', 'What is my savings rate?', 'Investment tips for me'] }])} style={{ marginLeft: 'auto', padding: '7px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', color: 'var(--text-muted)', cursor: 'pointer' }}>
                     <RefreshCw size={14} />
                   </button>
                 </div>
