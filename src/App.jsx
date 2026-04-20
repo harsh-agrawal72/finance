@@ -10,6 +10,7 @@ import NetWorth from './components/NetWorth/NetWorth';
 import Settings from './components/Settings/Settings';
 import MobileNav from './components/Layout/MobileNav';
 import Auth from './components/Auth/Auth';
+import Landing from './components/Landing/Landing';
 import { useFinanceData } from './hooks/useFinanceData';
 import { auth } from './firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
@@ -18,6 +19,8 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showAuth, setShowAuth] = useState(false);
+  const [authMode, setAuthMode] = useState('login');
   const [activeTab, setActiveTab] = useState(() => {
     return window.location.pathname !== '/' ? window.location.pathname.substring(1) : 'dashboard';
   });
@@ -30,6 +33,7 @@ function App() {
       // If a user just logged in, always start them on the dashboard
       if (currentUser) {
         handleTabChange('dashboard');
+        setShowAuth(false);
       }
     });
     return () => unsubscribe();
@@ -53,6 +57,11 @@ function App() {
     window.history.pushState(null, '', `/${tab}`);
   };
 
+  const handleStartAuth = (mode) => {
+    setAuthMode(mode);
+    setShowAuth(true);
+  };
+
   const finance = useFinanceData(user?.uid);
   const { data, exportJSON, resetData } = finance;
 
@@ -68,14 +77,18 @@ function App() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)' }}>
+      <div style={{ minHeight: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)' }}>
         <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} style={{ width: '40px', height: '40px', border: '3px solid rgba(0,242,255,0.1)', borderTopColor: 'var(--accent-cyan)', borderRadius: '50%' }} />
       </div>
     );
   }
 
   if (!user) {
-    return <Auth />;
+    return showAuth ? (
+      <Auth initialMode={authMode} onBack={() => setShowAuth(false)} />
+    ) : (
+      <Landing onStart={handleStartAuth} onLogin={() => handleStartAuth('login')} />
+    );
   }
 
   const renderContent = () => {
