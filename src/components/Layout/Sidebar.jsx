@@ -1,12 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, ReceiptText, PieChart, Target, BarChart2, TrendingUp, Download, RefreshCw, Zap, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, ReceiptText, PieChart, Target, BarChart2, TrendingUp, Download, RefreshCw, Settings, LogOut } from 'lucide-react';
+import Logo from '../Common/Logo';
 
 const Sidebar = ({ activeTab, setActiveTab, exportJSON, resetData, handleLogout }) => {
   const menuItems = [
     { id: 'dashboard',    label: 'Dashboard',     icon: LayoutDashboard, color: '#00f2ff' },
     { id: 'transactions', label: 'Transactions',   icon: ReceiptText,     color: '#00ffaa' },
-    { id: 'budget',       label: 'Budget AI',      icon: PieChart,        color: '#f59e0b' },
+    { id: 'budget',       icon: PieChart,        label: 'Budget AI',      color: '#f59e0b' },
     { id: 'savings',      label: 'Savings Goals',  icon: Target,          color: '#8b5cf6' },
     { id: 'analytics',   label: 'Analytics & AI', icon: BarChart2,       color: '#d946ef' },
     { id: 'networth',    label: 'Net Worth',       icon: TrendingUp,      color: '#22c55e' },
@@ -25,13 +26,13 @@ const Sidebar = ({ activeTab, setActiveTab, exportJSON, resetData, handleLogout 
       overflowY: 'auto',
     }}>
       {/* Logo */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '6px 12px', marginBottom: '32px', flexShrink: 0 }}>
-        <div style={{ width: '38px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,#0ea5e9,#8b5cf6)', borderRadius: '11px', boxShadow: '0 0 18px rgba(14,165,233,0.4)', flexShrink: 0 }}>
-          <Zap size={20} color="white" fill="white" />
-        </div>
-        <div>
-          <h2 style={{ fontWeight: 800, fontSize: '18px', letterSpacing: '-0.5px', background: 'linear-gradient(135deg,#00f2ff,#0ea5e9)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1.2 }}>Ledzo</h2>
-          <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase' }}>Ultra Edition</span>
+      <div style={{ padding: '6px 12px', marginBottom: '32px', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <Logo size={34} />
+          <div>
+            <h2 style={{ margin: 0, fontWeight: 800, fontSize: '18px', letterSpacing: '-0.5px', background: 'linear-gradient(135deg,#00f2ff,#0ea5e9)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1.2 }}>Ledzo</h2>
+            <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', display: 'block' }}>Ultra Edition</span>
+          </div>
         </div>
       </div>
 

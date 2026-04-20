@@ -10,6 +10,7 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { Mail, Lock, User, ArrowRight, LogIn } from 'lucide-react';
+import Logo from '../Common/Logo';
 
 const Auth = ({ initialMode = 'login', onBack }) => {
   const [isLogin, setIsLogin] = useState(initialMode === 'login');
@@ -117,15 +118,13 @@ const Auth = ({ initialMode = 'login', onBack }) => {
           <div style={{ 
             width: '64px', 
             height: '64px', 
-            background: 'linear-gradient(135deg, var(--accent-cyan), var(--accent-violet))', 
             borderRadius: '18px', 
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center', 
             margin: '0 auto 20px',
-            boxShadow: '0 8px 20px rgba(0, 242, 255, 0.3)'
           }}>
-            <LogIn size={32} color="white" strokeWidth={2.5} />
+            <Logo size={64} />
           </div>
           <h1 style={{ fontSize: '28px', fontWeight: 800, color: 'white', marginBottom: '8px' }}>
             {isLogin ? 'Welcome Back' : 'Join Ledzo'}

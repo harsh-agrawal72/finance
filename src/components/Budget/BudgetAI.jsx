@@ -99,7 +99,7 @@ const BudgetProgress = memo(({ title, current, target, suggested, icon: Icon, co
             ? (isExceeded ? 'rgba(0,242,255,0.2)' : (percentage >= 80 ? 'rgba(34,197,94,0.2)' : 'rgba(245,158,11,0.2)'))
             : (isExceeded ? 'rgba(255,77,77,0.2)' : 'rgba(34,197,94,0.2)')}` 
         }}>
-          <Zap size={13} fill="currentColor" />
+          <Sparkles size={13} fill="currentColor" />
           {isInverse 
             ? (isExceeded ? 'Elite Saver' : (percentage >= 80 ? 'Near Target' : 'Growing')) 
             : (isExceeded ? 'Over Budget' : 'On Track')

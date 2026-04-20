@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Zap, Shield, TrendingUp, PieChart, Sparkles, ArrowRight, CheckCircle2, 
+  Shield, TrendingUp, PieChart, Sparkles, ArrowRight, CheckCircle2, 
   ChevronDown, BarChart3, Wallet, Target, Lock, Globe, Layers, Cpu,
   Quote, Star, Activity, PlusCircle, RefreshCw, 
   ExternalLink, HelpCircle, Mail, MessageSquare, Monitor, Layout,
   Smartphone, Database, Code, ZapOff, Fingerprint, SearchSlash, AlertCircle
 } from 'lucide-react';
+import Logo from '../Common/Logo';
 
 const FAQItem = ({ question, answer }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -112,10 +113,8 @@ const Landing = ({ onStart, onLogin }) => {
         borderBottom: '1px solid rgba(255,255,255,0.05)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ width: '40px', height: '40px', background: 'linear-gradient(135deg, var(--accent-cyan), var(--accent-violet))', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 20px rgba(0, 242, 255, 0.2)' }}>
-            <Zap size={22} color="white" fill="white" />
-          </div>
-          <h2 style={{ fontWeight: 800, fontSize: '22px', letterSpacing: '-0.5px' }}>Ledzo Ultra</h2>
+          <Logo size={40} />
+          <h2 style={{ fontWeight: 800, fontSize: '22px', letterSpacing: '-0.5px', margin: 0 }}>Ledzo Ultra</h2>
         </div>
         
         <div style={{ display: 'flex', gap: '32px', alignItems: 'center' }}>
@@ -134,7 +133,7 @@ const Landing = ({ onStart, onLogin }) => {
             onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
             onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
           >
-            Start Free
+            Get Access
           </button>
         </div>
       </nav>
@@ -145,23 +144,23 @@ const Landing = ({ onStart, onLogin }) => {
           <motion.div variants={containerVariants} initial="hidden" animate="visible">
             <motion.div variants={itemVariants} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'rgba(255,255,255,0.03)', borderRadius: '100px', border: '1px solid rgba(255,255,255,0.08)', marginBottom: '40px' }}>
               <Sparkles size={14} color="var(--accent-cyan)" />
-              <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1.5px', color: 'var(--text-secondary)' }}>Trusted by 10k+ financial elites</span>
+              <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1.5px', color: 'var(--text-secondary)' }}>Trusted by 10k+ financial leaders</span>
             </motion.div>
 
             <motion.h1 variants={itemVariants} style={{ fontSize: 'clamp(54px, 10vw, 96px)', fontWeight: 900, lineHeight: 0.9, marginBottom: '40px', letterSpacing: '-5px' }}>
-              Engineered for <br />
+              Built for <br />
               <span style={{ background: 'linear-gradient(to right, var(--accent-cyan), var(--accent-violet))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                Extreme Clarity.
+                Total Control.
               </span>
             </motion.h1>
 
             <motion.p variants={itemVariants} style={{ fontSize: 'clamp(20px, 2.5vw, 26px)', color: 'var(--text-secondary)', maxWidth: '800px', margin: '0 auto 64px', lineHeight: 1.6, fontWeight: 500 }}>
-              The most advanced personal finance platform ever built. AI-powered insights, multi-currency support, and precision auditing for the high-end user.
+              The most advanced personal finance interface ever engineered. Precision auditing, AI-powered forecasting, and institutional-grade security.
             </motion.p>
 
             <motion.div variants={itemVariants} style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <button onClick={() => onStart('signup')} style={{ padding: '24px 56px', background: 'linear-gradient(135deg, var(--accent-cyan), var(--accent-violet))', borderRadius: '20px', color: 'white', fontWeight: 800, fontSize: '20px', boxShadow: '0 20px 40px -10px rgba(0, 242, 255, 0.4)' }}>Join the Elite</button>
-              <button style={{ padding: '24px 48px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', color: 'white', fontWeight: 700, fontSize: '20px' }}>Explore Platform</button>
+              <button onClick={() => onStart('signup')} style={{ padding: '24px 56px', background: 'linear-gradient(135deg, var(--accent-cyan), var(--accent-violet))', borderRadius: '20px', color: 'white', fontWeight: 800, fontSize: '20px', boxShadow: '0 20px 40px -10px rgba(0, 242, 255, 0.4)' }}>Get Started</button>
+              <button style={{ padding: '24px 48px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', color: 'white', fontWeight: 700, fontSize: '20px' }}>View Demo</button>
             </motion.div>
           </motion.div>
         </section>
@@ -174,136 +173,128 @@ const Landing = ({ onStart, onLogin }) => {
             viewport={{ once: true }}
             style={{ 
               width: '100%', 
-              minHeight: '600px',
-              background: 'linear-gradient(135deg, #0d1117, #05070a)', 
+              minHeight: '700px',
+              background: '#0a0c10', 
               borderRadius: '40px', 
               border: '1px solid rgba(255,255,255,0.08)',
-              boxShadow: '0 100px 200px -50px rgba(0, 242, 255, 0.1)',
-              padding: '32px',
+              padding: '0',
               display: 'flex',
               flexDirection: 'column',
-              gap: '32px',
               overflow: 'hidden',
               position: 'relative'
             }}
           >
-            {/* Platform Header Area (Premium replacement for dots) */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ width: '32px', height: '32px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Layout size={16} color="var(--accent-cyan)" />
-                </div>
-                <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-secondary)' }}>Dashboard Overview</div>
+            {/* Window Top Bar */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ff5f56' }} />
+                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ffbd2e' }} />
+                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#27c93f' }} />
               </div>
-              <div style={{ display: 'flex', gap: '16px' }}>
-                <div style={{ width: '80px', height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} />
-                <div style={{ width: '40px', height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} />
+              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '6px 20px', borderRadius: '100px', fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontWeight: 600, letterSpacing: '0.5px' }}>ledzo.app/secure/overview</div>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
               </div>
             </div>
-            
-            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '220px 1fr', gap: '40px' }}>
-              {/* Sidebar Mockup */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <div style={{ width: '100%', height: '40px', background: 'rgba(0, 242, 255, 0.1)', borderRadius: '12px', border: '1px solid rgba(0, 242, 255, 0.2)', display: 'flex', alignItems: 'center', padding: '0 12px' }}>
-                   <div style={{ width: '16px', height: '16px', borderRadius: '4px', background: 'var(--accent-cyan)', marginRight: '12px' }} />
-                   <div style={{ width: '60px', height: '6px', background: 'rgba(255,255,255,0.3)', borderRadius: '2px' }} />
-                </div>
-                {[1, 2, 3, 4].map(i => (
-                  <div key={i} style={{ width: '100%', height: '40px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', display: 'flex', alignItems: 'center', padding: '0 12px' }}>
-                    <div style={{ width: '16px', height: '16px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)', marginRight: '12px' }} />
-                    <div style={{ width: '40px', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px' }} />
-                  </div>
-                ))}
-                
-                <div style={{ marginTop: 'auto', padding: '20px', background: 'rgba(0, 242, 255, 0.05)', borderRadius: '20px', border: '1px solid rgba(0, 242, 255, 0.1)' }}>
-                   <div style={{ width: '100%', height: '10px', background: 'rgba(255,255,255,0.1)', borderRadius: '5px', marginBottom: '12px' }} />
-                   <div style={{ width: '70%', height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '3px' }} />
-                </div>
-              </div>
-              
-              {/* Main Mockup Content */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
-                  {[
-                    { color: 'var(--accent-cyan)', label: 'Net Worth', value: '$254.2k' },
-                    { color: 'var(--accent-violet)', label: 'Monthly Flow', value: '+12.4%' },
-                    { color: 'var(--accent-emerald)', label: 'Total Assets', value: '42' }
-                  ].map((stat, i) => (
-                    <motion.div 
-                      key={i} 
-                      whileHover={{ y: -5, borderColor: 'rgba(255,255,255,0.1)' }}
-                      style={{ padding: '20px', background: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)', transition: '0.3s' }}
-                    >
-                       <div style={{ color: 'var(--text-secondary)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 700, marginBottom: '8px' }}>{stat.label}</div>
-                       <div style={{ fontSize: '24px', fontWeight: 800, color: 'white' }}>{stat.value}</div>
-                       <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.03)', borderRadius: '2px', marginTop: '12px', overflow: 'hidden' }}>
-                          <motion.div 
-                            initial={{ width: 0 }}
-                            whileInView={{ width: '60%' }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.5 + i * 0.1, duration: 1 }}
-                            style={{ height: '100%', background: stat.color }} 
-                          />
-                       </div>
-                    </motion.div>
+
+            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '240px 1fr 320px', gap: '0' }}>
+              {/* Sidebar Section */}
+              <div style={{ padding: '32px 24px', borderRight: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.01)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '40px' }}>
+                  {['Overview', 'Wealth Engine', 'Audit Log', 'Treasury', 'Vaults'].map((item, i) => (
+                    <div key={item} style={{ padding: '10px 16px', borderRadius: '12px', background: i === 0 ? 'rgba(0,242,255,0.05)' : 'transparent', color: i === 0 ? 'var(--accent-cyan)' : 'var(--text-secondary)', fontSize: '13px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '12px', opacity: i === 0 ? 1 : 0.5 }}>
+                      <div style={{ width: '16px', height: '16px', borderRadius: '4px', background: i === 0 ? 'var(--accent-cyan)' : 'white' }} />
+                      {item}
+                    </div>
                   ))}
                 </div>
-                
-                <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '24px' }}>
-                  {/* Mock Chart Area */}
-                  <div style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.05)', padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                       <div style={{ width: '120px', height: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px' }} />
-                       <div style={{ display: 'flex', gap: '8px' }}>
-                          <div style={{ width: '32px', height: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} />
-                          <div style={{ width: '32px', height: '16px', background: 'var(--accent-cyan)20', borderRadius: '4px', border: '1px solid var(--accent-cyan)40' }} />
-                       </div>
-                    </div>
-                    <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'flex-end', gap: '12px' }}>
-                       {[40, 60, 45, 80, 55, 90, 70, 85, 100].map((h, i) => (
-                         <motion.div 
-                           key={i} 
-                           initial={{ height: 0 }}
-                           whileInView={{ height: `${h}%` }}
-                           viewport={{ once: true }}
-                           transition={{ delay: 0.8 + i * 0.05, duration: 0.5 }}
-                           style={{ flex: 1, background: `linear-gradient(to top, ${i === 8 ? 'var(--accent-cyan)' : 'rgba(255,255,255,0.08)'}, transparent)`, borderRadius: '4px' }} 
-                         />
-                       ))}
-                    </div>
+                <div style={{ marginTop: 'auto', padding: '24px', background: 'linear-gradient(to bottom, rgba(0,242,255,0.05), transparent)', borderRadius: '24px', border: '1px solid rgba(0,242,255,0.1)' }}>
+                  <div style={{ fontSize: '10px', fontWeight: 800, color: 'var(--accent-cyan)', marginBottom: '8px' }}>IDENTITY VERIFIED</div>
+                  <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
+                    <div style={{ width: '100%', height: '100%', background: 'var(--accent-cyan)' }} />
                   </div>
-                  
-                  {/* Mock List Area */}
-                  <div style={{ background: 'rgba(255,255,255,0.01)', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.05)', padding: '24px' }}>
-                    <div style={{ width: '80px', height: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '5px', marginBottom: '24px' }} />
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                      {[1, 2, 3, 4, 5].map(i => (
-                        <motion.div 
-                          key={i} 
-                          initial={{ opacity: 0, x: 10 }}
-                          whileInView={{ opacity: 1, x: 0 }}
-                          viewport={{ once: true }}
-                          transition={{ delay: 1 + i * 0.1 }}
-                          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                        >
-                          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                            <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: 'rgba(255,255,255,0.03)' }} />
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                               <div style={{ width: '40px', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px' }} />
-                               <div style={{ width: '25px', height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px' }} />
-                            </div>
-                          </div>
-                          <div style={{ width: '30px', height: '6px', background: i % 2 === 0 ? 'var(--accent-emerald)40' : 'rgba(255,255,255,0.1)', borderRadius: '3px' }} />
-                        </motion.div>
-                      ))}
+                </div>
+              </div>
+
+              {/* Main Content Area */}
+              <div style={{ padding: '40px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <h3 style={{ fontSize: '12px', fontWeight: 800, color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase' }}>Portfolio Value</h3>
+                    <div style={{ fontSize: '32px', fontWeight: 900 }}>$1,242,520.40</div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)' }} />
+                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)' }} />
+                  </div>
+                </header>
+
+                {/* Stat Cards */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+                  {[
+                    { label: 'Growth', value: '+12.5%', color: 'var(--accent-emerald)' },
+                    { label: 'Audit Score', value: '99.4', color: 'var(--accent-cyan)' },
+                    { label: 'Asset Ratio', value: '4.2', color: 'var(--accent-violet)' }
+                  ].map((stat, i) => (
+                    <div key={i} style={{ padding: '20px', background: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                      <div style={{ fontSize: '10px', fontWeight: 800, color: 'var(--text-secondary)', marginBottom: '8px' }}>{stat.label}</div>
+                      <div style={{ fontSize: '20px', fontWeight: 900, color: stat.color }}>{stat.value}</div>
                     </div>
+                  ))}
+                </div>
+
+                {/* Major Visualization */}
+                <div style={{ flex: 1, background: 'rgba(255,255,255,0.01)', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.05)', padding: '24px', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: 800, opacity: 0.3 }}>PERFORMANCE ANALYTICS</span>
+                      <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--accent-cyan)' }}>REAL-TIME</span>
+                    </div>
+                    <svg width="100%" height="70%" viewBox="0 0 400 150" preserveAspectRatio="none" style={{ position: 'absolute', bottom: 0, left: 0 }}>
+                       <path d="M0,120 Q50,110 100,50 T200,80 T300,30 T400,10" stroke="var(--accent-cyan)" strokeWidth="3" fill="none" />
+                       <path d="M0,120 Q50,110 100,50 T200,80 T300,30 T400,10 L400,150 L0,150 Z" fill="url(#grad)" opacity="0.1" />
+                       <defs>
+                         <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                           <stop offset="0%" style={{ stopColor: 'var(--accent-cyan)', stopOpacity: 0.5 }} />
+                           <stop offset="100%" style={{ stopColor: 'var(--accent-cyan)', stopOpacity: 0 }} />
+                         </linearGradient>
+                       </defs>
+                    </svg>
+                </div>
+              </div>
+
+              {/* Side Panel Area */}
+              <div style={{ padding: '32px', borderLeft: '1px solid rgba(255,255,255,0.05)', background: 'rgba(0,0,0,0.1)' }}>
+                <h4 style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-secondary)', marginBottom: '24px', opacity: 0.3, letterSpacing: '1px' }}>RECENT OPERATIONS</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                   {[
+                     { tx: 'Vault Deposit', val: '+$12,000', col: 'var(--accent-emerald)' },
+                     { tx: 'AI Optimization', val: 'Complete', col: 'var(--accent-cyan)' },
+                     { tx: 'Inbound Wire', val: '+$40,000', col: 'var(--accent-emerald)' },
+                     { tx: 'Liquidity Move', val: '-$5,200', col: '#ff5f56' }
+                   ].map((item, i) => (
+                     <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                         <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)' }} />
+                         <div style={{ fontSize: '13px', fontWeight: 600 }}>{item.tx}</div>
+                       </div>
+                       <div style={{ fontSize: '13px', fontWeight: 800, color: item.col }}>{item.val}</div>
+                     </div>
+                   ))}
+                </div>
+                <div style={{ marginTop: '40px', padding: '24px', background: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 800, marginBottom: '12px' }}>
+                    <span style={{ opacity: 0.3 }}>TOTAL SAFETY</span>
+                    <span>99.4%</span>
+                  </div>
+                  <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
+                    <div style={{ width: '99%', height: '100%', background: 'linear-gradient(to right, var(--accent-cyan), var(--accent-violet))' }} />
                   </div>
                 </div>
               </div>
             </div>
             
-            {/* Overlay Gradient (Bottom fade) */}
-            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '30%', background: 'linear-gradient(to top, #05070a 20%, transparent)', zIndex: 2 }} />
+            {/* Ambient Background Glow */}
+            <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(circle at 50% 0%, rgba(0,242,255,0.03), transparent)' }} />
           </motion.div>
         </section>
 
@@ -502,10 +493,8 @@ const Landing = ({ onStart, onLogin }) => {
             {/* Brand Section */}
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
-                <div style={{ width: '40px', height: '40px', background: 'linear-gradient(135deg, var(--accent-cyan), var(--accent-violet))', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Zap size={22} color="white" fill="white" />
-                </div>
-                <h2 style={{ fontWeight: 800, fontSize: '22px' }}>Ledzo Ultra</h2>
+                <Logo size={40} />
+                <h2 style={{ fontWeight: 800, fontSize: '22px', margin: 0 }}>Ledzo Ultra</h2>
               </div>
               <p style={{ color: 'var(--text-secondary)', fontSize: '15px', fontWeight: 500 }}>Precision financial platform for the high-end user.</p>
             </div>
