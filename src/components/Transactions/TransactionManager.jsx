@@ -1,6 +1,7 @@
-import React, { useState, memo, useCallback } from 'react';
+import React, { useState, memo, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Plus, Trash2, Repeat, Download, ArrowUpRight, ArrowDownRight, Edit2, Check } from 'lucide-react';
+import { useIsMobile } from '../../hooks/useMediaQuery';
 
 const COLORS = { income: 'var(--accent-emerald)', expense: 'var(--danger)' };
 
@@ -92,6 +93,7 @@ const FormRow = memo(({ data, setData, onSubmit, onCancel, isEdit, categories, c
 
 // ─── Main component ────────────────────────────────────────────────────────────
 const TransactionManager = ({ transactions, addTransaction, deleteTransaction, editTransaction, categories, currency = '₹' }) => {
+  const isMobile = useIsMobile();
   const BLANK = useCallback(() => ({
     amount: '', category: categories?.expense?.[0] || 'Groceries',
     description: '', note: '',
@@ -108,7 +110,7 @@ const TransactionManager = ({ transactions, addTransaction, deleteTransaction, e
   const [formData,       setFormData]       = useState(BLANK);
   const [editData,       setEditData]       = useState(null);
   const [showSuccess,    setShowSuccess]    = useState(false);
-  const isMobile = window.innerWidth <= 768;
+
 
   // ── Stable handlers (no inline arrows passed to FormRow) ──────────────────
   const handleSubmit = useCallback((e) => {
@@ -158,24 +160,29 @@ const TransactionManager = ({ transactions, addTransaction, deleteTransaction, e
   }, [transactions]);
 
   // ── Derived data ──────────────────────────────────────────────────────────
-  const allCategories = [...(categories?.income || []), ...(categories?.expense || [])];
+  const allCategories = useMemo(() => [...(categories?.income || []), ...(categories?.expense || [])], [categories]);
 
-  const filtered = transactions
-    .filter(t => {
-      const s = searchTerm.toLowerCase();
-      return (t.description.toLowerCase().includes(s) || t.category.toLowerCase().includes(s))
-        && (filterType === 'all' || t.type === filterType)
-        && (filterCategory === 'all' || t.category === filterCategory);
-    })
-    .sort((a, b) => {
-      const av = sortConfig.key === 'amount' ? Number(a.amount) : a[sortConfig.key];
-      const bv = sortConfig.key === 'amount' ? Number(b.amount) : b[sortConfig.key];
-      return av < bv ? (sortConfig.direction === 'asc' ? -1 : 1)
-           : av > bv ? (sortConfig.direction === 'asc' ? 1 : -1) : 0;
-    });
+  const filtered = useMemo(() => {
+    return transactions
+      .filter(t => {
+        const s = searchTerm.toLowerCase();
+        return (t.description.toLowerCase().includes(s) || t.category.toLowerCase().includes(s))
+          && (filterType === 'all' || t.type === filterType)
+          && (filterCategory === 'all' || t.category === filterCategory);
+      })
+      .sort((a, b) => {
+        const av = sortConfig.key === 'amount' ? Number(a.amount) : a[sortConfig.key];
+        const bv = sortConfig.key === 'amount' ? Number(b.amount) : b[sortConfig.key];
+        return av < bv ? (sortConfig.direction === 'asc' ? -1 : 1)
+             : av > bv ? (sortConfig.direction === 'asc' ? 1 : -1) : 0;
+      });
+  }, [transactions, searchTerm, filterType, filterCategory, sortConfig]);
 
-  const totalIncome  = filtered.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0);
-  const totalExpense = filtered.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
+  const { totalIncome, totalExpense } = useMemo(() => {
+    const income = filtered.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0);
+    const expense = filtered.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
+    return { totalIncome: income, totalExpense: expense };
+  }, [filtered]);
 
   // ── JSX ───────────────────────────────────────────────────────────────────
   return (

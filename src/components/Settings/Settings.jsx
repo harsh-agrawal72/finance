@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { User, DollarSign, Bell, Download, Upload, RefreshCw, Trash2, Check, Plus, X, Palette, Mail, Calendar, ShieldCheck, ShieldAlert, LogIn } from 'lucide-react';
+import { useIsMobile } from '../../hooks/useMediaQuery';
 
 const CARD  = { background: 'rgba(15,23,42,0.45)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '20px', padding: '28px' };
 const INPUT = { padding: '11px 14px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: 'var(--text-primary)', borderRadius: '10px', outline: 'none', fontFamily: 'inherit', fontSize: '14px', boxSizing: 'border-box', width: '100%' };
@@ -15,6 +16,7 @@ const Settings = ({ user, data, updateSettings, categories, addCategory, exportJ
   const [importText, setImportText] = useState('');
   const [importStatus, setImportStatus] = useState('');
   const [syncing, setSyncing]     = useState(false);
+  const isMobile = useIsMobile();
 
   const handleSaveProfile = () => {
     updateSettings({ userName: profile.userName, currency: profile.currency });

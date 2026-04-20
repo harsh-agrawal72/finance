@@ -1,7 +1,8 @@
-import React, { useState, memo, useCallback } from 'react';
+import React, { useState, memo, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Plus, X, Calendar, ArrowUpCircle, ArrowDownCircle, Edit2, Check, AlertCircle, TrendingUp, Milestone } from 'lucide-react';
 import { differenceInDays } from 'date-fns';
+import { useIsMobile } from '../../hooks/useMediaQuery';
 
 const ICONS = ['🎯', '🏠', '💻', '✈️', '🚗', '💍', '📚', '💰', '🛡️', '🎓', '🏋️', '🎸', '🎮', '📱', '🌴', '🍕', '⚡', '🌟'];
 const COLORS = ['#00f2ff', '#8b5cf6', '#00ffaa', '#f59e0b', '#d946ef', '#f43f5e', '#0ea5e9', '#22c55e'];
@@ -11,6 +12,7 @@ const LABEL_STYLE = { fontSize: '10px', fontWeight: 800, color: 'var(--text-mute
 const CARD = { background: 'rgba(15,23,42,0.45)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '20px', padding: '28px' };
 
 const SavingsGamified = ({ goals, addGoal, deleteGoal, depositToGoal, withdrawFromGoal, editGoal, currency = '₹' }) => {
+  const isMobile = useIsMobile();
   const [showAddGoal, setShowAddGoal] = useState(false);
   const [activeInput, setActiveInput] = useState(null);  // { id, mode: 'deposit'|'withdraw' }
   const [inputAmount, setInputAmount] = useState('');
@@ -50,10 +52,13 @@ const SavingsGamified = ({ goals, addGoal, deleteGoal, depositToGoal, withdrawFr
   };
 
   // ── Summary ──────────────────────────────────────────────────────────────
-  const totalSaved = goals.reduce((s, g) => s + Number(g.current), 0);
-  const totalTarget = goals.reduce((s, g) => s + Number(g.target), 0);
-  const completed = goals.filter(g => Number(g.current) >= Number(g.target)).length;
-  const overallPct = totalTarget > 0 ? Math.round((totalSaved / totalTarget) * 100) : 0;
+  const { totalSaved, totalTarget, completed, overallPct } = useMemo(() => {
+    const saved = goals.reduce((s, g) => s + Number(g.current), 0);
+    const target = goals.reduce((s, g) => s + Number(g.target), 0);
+    const comp = goals.filter(g => Number(g.current) >= Number(g.target)).length;
+    const pct = target > 0 ? Math.round((saved / target) * 100) : 0;
+    return { totalSaved: saved, totalTarget: target, completed: comp, overallPct: pct };
+  }, [goals]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', width: '100%' }}>

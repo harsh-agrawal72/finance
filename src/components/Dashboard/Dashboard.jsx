@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { Line, Bar } from 'react-chartjs-2';
 import { ArrowUpRight, ArrowDownRight, Wallet, BrainCircuit, TrendingUp, Plus, Receipt, Activity, X, Check } from 'lucide-react';
+import { useIsMobile } from '../../hooks/useMediaQuery';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler);
 
@@ -11,7 +12,8 @@ const Dashboard = ({ userName, totals, healthScore, insights, recentTransactions
   const [chartMode, setChartMode] = useState('line');
   const [form, setForm] = useState({ amount: '', category: categories?.expense?.[0] || 'Groceries', description: '', date: new Date().toISOString().split('T')[0], type: 'expense', recurring: 'none', note: '' });
   const [success, setSuccess] = useState(false);
-  const isMobile = window.innerWidth <= 768;
+  
+  const isMobile = useIsMobile();
 
   const greeting = () => {
     const h = new Date().getHours();
@@ -30,34 +32,35 @@ const Dashboard = ({ userName, totals, healthScore, insights, recentTransactions
     setTimeout(() => setSuccess(false), 2500);
   };
 
-  const labels = monthlyHistory?.map(m => m.label) || [];
-  const lineData = {
+  const labels = useMemo(() => monthlyHistory?.map(m => m.label) || [], [monthlyHistory]);
+
+  const lineData = useMemo(() => ({
     labels,
     datasets: [
       { fill: true, label: 'Income', data: monthlyHistory?.map(m => m.income) || [], borderColor: '#00ffaa', borderWidth: 2, pointBackgroundColor: '#00ffaa', backgroundColor: (ctx) => { const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 300); g.addColorStop(0, 'rgba(0,255,170,0.15)'); g.addColorStop(1, 'rgba(0,255,170,0)'); return g; }, tension: 0.4 },
       { fill: true, label: 'Expenses', data: monthlyHistory?.map(m => m.expenses) || [], borderColor: '#ff4d4d', borderWidth: 2, pointBackgroundColor: '#ff4d4d', backgroundColor: (ctx) => { const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 300); g.addColorStop(0, 'rgba(255,77,77,0.1)'); g.addColorStop(1, 'rgba(255,77,77,0)'); return g; }, tension: 0.4 },
     ],
-  };
+  }), [monthlyHistory, labels]);
 
-  const barData = {
+  const barData = useMemo(() => ({
     labels,
     datasets: [
       { label: 'Income', data: monthlyHistory?.map(m => m.income) || [], backgroundColor: 'rgba(0,255,170,0.6)', borderRadius: 6 },
       { label: 'Expenses', data: monthlyHistory?.map(m => m.expenses) || [], backgroundColor: 'rgba(255,77,77,0.6)', borderRadius: 6 },
       { label: 'Savings', data: monthlyHistory?.map(m => m.savings) || [], backgroundColor: 'rgba(0,242,255,0.5)', borderRadius: 6 },
     ],
-  };
+  }), [monthlyHistory, labels]);
 
-  const chartOptions = {
+  const chartOptions = useMemo(() => ({
     responsive: true, maintainAspectRatio: false,
     plugins: { legend: { display: true, labels: { color: '#64748b', font: { family: 'Outfit', size: 12 }, usePointStyle: true } }, tooltip: { backgroundColor: '#0d1117', titleFont: { family: 'Outfit', size: 13 }, bodyFont: { family: 'Outfit', size: 13 }, padding: 12, borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1, callbacks: { label: (ctx) => ` ${ctx.raw < 0 ? '-' : ''}${currency}${Math.abs(Number(ctx.raw)).toLocaleString()}` } } },
     scales: { y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#475569', font: { family: 'Outfit', size: 11 }, callback: (v) => `${v < 0 ? '-' : ''}${currency}${Math.abs(v) >= 1000 ? Math.round(Math.abs(v) / 1000) + 'k' : Math.abs(v)}` } }, x: { grid: { display: false }, ticks: { color: '#475569', font: { family: 'Outfit', size: 12 } } } },
-  };
+  }), [currency]);
 
-  const StatCard = ({ title, value, icon: Icon, color, trend, delay, prefix = currency }) => (
+  const StatCard = useMemo(() => ({ title, value, icon: Icon, color, trend, delay, prefix = currency }) => (
     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay, duration: 0.4 }} whileHover={{ y: -4 }}
       style={{ flex: 1, minWidth: isMobile ? '100%' : '180px', background: 'rgba(15,23,42,0.4)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '20px', padding: '24px', position: 'relative', overflow: 'hidden', transition: 'all 0.3s', cursor: 'default' }}>
-      <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '100px', height: '100px', background: `radial-gradient(circle, ${color}18, transparent 70%)`, pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '1000px', height: '1000px', background: `radial-gradient(circle, ${color}18, transparent 70%)`, pointerEvents: 'none' }} />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
         <div style={{ padding: '10px', background: `${color}18`, borderRadius: '12px', color, border: `1px solid ${color}25` }}><Icon size={22} /></div>
         {trend !== undefined && (
@@ -72,7 +75,8 @@ const Dashboard = ({ userName, totals, healthScore, insights, recentTransactions
         {value < 0 ? '-' : ''}{prefix}{Math.abs(typeof value === 'number' ? value : 0).toLocaleString()}
       </h3>
     </motion.div>
-  );
+  ), [isMobile, currency]);
+
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', width: '100%' }}>

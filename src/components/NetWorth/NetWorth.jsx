@@ -1,6 +1,7 @@
-import React, { useState, memo, useCallback } from 'react';
+import React, { useState, memo, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Trash2, TrendingUp, TrendingDown, DollarSign, X } from 'lucide-react';
+import { useIsMobile } from '../../hooks/useMediaQuery';
 
 const CARD = { background: 'rgba(15,23,42,0.45)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '20px', padding: '24px' };
 const LABEL = { fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '5px' };
@@ -49,15 +50,9 @@ const NetWorth = ({ assets, liabilities, addAsset, deleteAsset, addLiability, de
   const [showAddLiability, setShowAddLiability] = useState(false);
   const [assetForm,        setAssetForm]        = useState({ name: '', value: '', type: 'liquid' });
   const [liabilityForm,    setLiabilityForm]    = useState({ name: '', value: '', type: 'short-term' });
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-
-  React.useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const nw = getNetWorth();
+  
+  const isMobile = useIsMobile();
+  const nw = useMemo(() => getNetWorth(), [getNetWorth]);
 
   const handleAddAsset = useCallback((e) => {
     e.preventDefault();

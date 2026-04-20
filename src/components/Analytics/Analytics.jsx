@@ -1,8 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, RadialLinearScale, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { Line, Bar, Doughnut, Radar } from 'react-chartjs-2';
 import { TrendingUp, TrendingDown, BarChart2, PieChart, AlertTriangle, Repeat, BrainCircuit, Target, Send, RefreshCw, DollarSign, Activity } from 'lucide-react';
+import { useIsMobile } from '../../hooks/useMediaQuery';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, RadialLinearScale, Title, Tooltip, Legend, Filler);
 
@@ -20,12 +21,7 @@ const Analytics = ({
   currency = '₹'
 }) => {
   const [activeSection, setActiveSection] = useState('overview');
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const isMobile = useIsMobile();
 
   const [chatHistory, setChatHistory] = useState([
     { role: 'ai', text: `Hi ${userName || 'User'}! I'm your **Personal Finance AI Advisor** 🤖\n\nI'm connected to your real financial data and can give you personalized answers. Try asking me:\n\n• *How much should I spend on food?*\n• *Will I overspend this month?*\n• *Where should I invest?*\n• *How to pay off my debt faster?*`, suggestions: ['How much should I spend on food?', 'What is my savings rate?', 'Investment tips for me'] }
@@ -71,51 +67,40 @@ const Analytics = ({
   const [expandedCategory, setExpandedCategory] = useState(null);
 
   // ── Chart data ────────────────────────────────────────────────────────
-  const labels = monthlyHistory.map(m => m.label);
+  const labels = useMemo(() => monthlyHistory.map(m => m.label), [monthlyHistory]);
 
-  const lineData = {
+  const lineData = useMemo(() => ({
     labels,
     datasets: [
       { fill: true, label: 'Income', data: monthlyHistory.map(m => m.income), borderColor: '#00ffaa', borderWidth: 2.5, backgroundColor: ctx => { const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 250); g.addColorStop(0, 'rgba(0,255,170,0.18)'); g.addColorStop(1, 'transparent'); return g; }, tension: 0.4, pointBackgroundColor: '#00ffaa', pointRadius: 4 },
       { fill: true, label: 'Expenses', data: monthlyHistory.map(m => m.expenses), borderColor: '#ff4d4d', borderWidth: 2.5, backgroundColor: ctx => { const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 250); g.addColorStop(0, 'rgba(255,77,77,0.12)'); g.addColorStop(1, 'transparent'); return g; }, tension: 0.4, pointBackgroundColor: '#ff4d4d', pointRadius: 4 },
       { label: 'Savings', data: monthlyHistory.map(m => m.savings), borderColor: '#00f2ff', borderWidth: 2, borderDash: [5, 4], backgroundColor: 'transparent', tension: 0.4, pointRadius: 3 },
     ],
-  };
+  }), [monthlyHistory, labels]);
 
-  const barData = {
+  const barData = useMemo(() => ({
     labels,
     datasets: [
       { label: 'Income', data: monthlyHistory.map(m => m.income), backgroundColor: 'rgba(0,255,170,0.65)', borderRadius: 8, borderSkipped: false },
       { label: 'Expenses', data: monthlyHistory.map(m => m.expenses), backgroundColor: 'rgba(255,77,77,0.65)', borderRadius: 8, borderSkipped: false },
     ],
-  };
+  }), [monthlyHistory, labels]);
 
-  const doughnutData = {
+  const doughnutData = useMemo(() => ({
     labels: categoryBreakdown.slice(0, 7).map(c => c.name),
     datasets: [{ data: categoryBreakdown.slice(0, 7).map(c => c.amount), backgroundColor: NEON, borderWidth: 0, hoverOffset: 14 }],
-  };
+  }), [categoryBreakdown]);
 
-  const radarData = {
+  const radarData = useMemo(() => ({
     labels: ['Savings Rate', 'Budget Control', 'Low Debt', 'Goal Progress', 'Income Diversity', 'Emergency Fund'],
     datasets: [{
       label: 'Your Score',
       data: [
-        // 1. Savings Rate (Target: 20%+)
         Math.max(0, Math.min(100, totals.savingsRate * 5)),
-        
-        // 2. Budget Control (Efficiency of spending)
         Math.max(0, 100 - Math.round((totals.expenses / Math.max(totals.income, 1)) * 100)),
-        
-        // 3. Low Debt (Debt to Asset ratio)
         Math.max(0, 100 - Math.round((netWorthData.totalLiabilities / Math.max(netWorthData.totalAssets, 1)) * 100)),
-        
-        // 4. Goal Progress (Average completion %)
         Math.round((goals.reduce((s, g) => s + Number(g.current), 0) / Math.max(goals.reduce((s, g) => s + Number(g.target), 0), 1)) * 100),
-        
-        // 5. Income Diversity (Number of sources)
         Math.min(100, Array.from(new Set(transactions.filter(t => t.type === 'income').map(t => t.category))).length * 25),
-        
-        // 6. Emergency Fund (Months of coverage, Target: 6 months)
         Math.min(100, Math.round(((assets.filter(a => a.type === 'liquid').reduce((s, a) => s + Number(a.value), 0)) / Math.max(totals.expenses, 1)) * 16.6)),
       ],
       borderColor: '#00f2ff',
@@ -123,24 +108,24 @@ const Analytics = ({
       borderWidth: 2,
       pointBackgroundColor: '#00f2ff',
     }],
-  };
+  }), [totals, netWorthData, goals, transactions, assets]);
 
-  const chartOpts = {
+  const chartOpts = useMemo(() => ({
     responsive: true, maintainAspectRatio: false,
     plugins: { legend: { labels: { color: '#64748b', font: { family: 'Outfit', size: 12 }, usePointStyle: true, padding: 16 } }, tooltip: { ...tooltipStyle, callbacks: { label: (ctx) => ` ${ctx.raw < 0 ? '-' : ''}${currency}${Math.abs(Number(ctx.raw)).toLocaleString()}` } } },
     scales: { y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { ...tickStyle, callback: v => `${v < 0 ? '-' : ''}${currency}${Math.abs(v) >= 1000 ? Math.round(Math.abs(v) / 1000) + 'k' : Math.abs(v)}` }, border: { display: false } }, x: { grid: { display: false }, ticks: tickStyle, border: { display: false } } },
-  };
+  }), [currency]);
 
-  const doughnutOpts = {
+  const doughnutOpts = useMemo(() => ({
     cutout: '70%',
     plugins: { legend: { position: 'right', labels: { color: '#94a3b8', font: { family: 'Outfit', size: 12 }, usePointStyle: true, padding: 14, generateLabels: (chart) => { const data = chart.data; return data.labels.map((label, i) => ({ text: `${label}  ${currency}${data.datasets[0].data[i].toLocaleString()}`, fillStyle: data.datasets[0].backgroundColor[i], hidden: false, index: i })); } } }, tooltip: tooltipStyle },
-  };
+  }), [currency]);
 
-  const radarOpts = {
+  const radarOpts = useMemo(() => ({
     responsive: true, maintainAspectRatio: false,
     scales: { r: { angleLines: { color: 'rgba(255,255,255,0.06)' }, grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#475569', font: { family: 'Outfit', size: 10 }, backdropColor: 'transparent' }, pointLabels: { color: '#94a3b8', font: { family: 'Outfit', size: 11 } }, min: 0, max: 100 } },
     plugins: { legend: { display: false }, tooltip: tooltipStyle },
-  };
+  }), []);
 
   const sections = [
     { id: 'overview', label: 'Overview', icon: BarChart2 },

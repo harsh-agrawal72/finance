@@ -1,8 +1,9 @@
 import React, { useState, memo, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Target, AlertCircle, TrendingUp, ShieldCheck, Zap, Edit2, Check, X } from 'lucide-react';
+import { Target, AlertCircle, TrendingUp, ShieldCheck, Zap, Edit2, Check, X, Sparkles } from 'lucide-react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
+import { useIsMobile } from '../../hooks/useMediaQuery';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -118,6 +119,7 @@ const BudgetProgress = memo(({ title, current, target, suggested, icon: Icon, co
 
 // ─── Main BudgetAI Component ────────────────────────────────────────────────
 const BudgetAI = ({ totals, budgets, setBudget, currency = '₹' }) => {
+  const isMobile = useIsMobile();
   const needs = budgets['Needs'] || { amount: 0, spent: 0 };
   const wants = budgets['Wants'] || { amount: 0, spent: 0 };
   const savings = budgets['Savings'] || { amount: 0, spent: 0 };
@@ -159,7 +161,7 @@ const BudgetAI = ({ totals, budgets, setBudget, currency = '₹' }) => {
       </div>
 
       {/* Doughnut + Info */}
-      <div className="glass-card responsive-stack" style={{ display: 'flex', flexDirection: window.innerWidth <= 768 ? 'column' : 'row', flexWrap: 'nowrap', gap: '40px', alignItems: 'center', padding: window.innerWidth <= 768 ? '24px' : '36px' }}>
+      <div className="glass-card responsive-stack" style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', flexWrap: 'nowrap', gap: '40px', alignItems: 'center', padding: isMobile ? '24px' : '36px' }}>
         <div style={{ flex: 1, minWidth: '280px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
             <div style={{ padding: '14px', background: 'rgba(139,92,246,0.15)', borderRadius: '16px', color: 'var(--accent-violet)', border: '1px solid rgba(139,92,246,0.2)' }}>
@@ -190,8 +192,8 @@ const BudgetAI = ({ totals, budgets, setBudget, currency = '₹' }) => {
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: window.innerWidth <= 768 ? '0 0 200px' : '0 0 260px' }}>
-          <div style={{ width: window.innerWidth <= 768 ? '200px' : '260px', height: window.innerWidth <= 768 ? '200px' : '260px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: isMobile ? '0 0 200px' : '0 0 260px' }}>
+          <div style={{ width: isMobile ? '200px' : '260px', height: isMobile ? '200px' : '260px' }}>
             <Doughnut
               data={{
                 labels: ['Needs', 'Wants', 'Savings'],

@@ -1,19 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from './components/Layout/Sidebar';
-import Dashboard from './components/Dashboard/Dashboard';
-import TransactionManager from './components/Transactions/TransactionManager';
-import BudgetAI from './components/Budget/BudgetAI';
-import SavingsGamified from './components/Savings/SavingsGamified';
-import Analytics from './components/Analytics/Analytics';
-import NetWorth from './components/NetWorth/NetWorth';
-import Settings from './components/Settings/Settings';
 import MobileNav from './components/Layout/MobileNav';
-import Auth from './components/Auth/Auth';
-import Landing from './components/Landing/Landing';
+
+// Lazy load feature components for better performance
+const Dashboard = lazy(() => import('./components/Dashboard/Dashboard'));
+const TransactionManager = lazy(() => import('./components/Transactions/TransactionManager'));
+const BudgetAI = lazy(() => import('./components/Budget/BudgetAI'));
+const SavingsGamified = lazy(() => import('./components/Savings/SavingsGamified'));
+const Analytics = lazy(() => import('./components/Analytics/Analytics'));
+const NetWorth = lazy(() => import('./components/NetWorth/NetWorth'));
+const Settings = lazy(() => import('./components/Settings/Settings'));
+const Auth = lazy(() => import('./components/Auth/Auth'));
+const Landing = lazy(() => import('./components/Landing/Landing'));
+
 import { useFinanceData } from './hooks/useFinanceData';
+import { useIsMobile } from './hooks/useMediaQuery';
 import { auth } from './firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
+
+/**
+ * Premium Loading Component for Lazy Loading
+ */
+const PageLoader = () => (
+  <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
+    <motion.div 
+      animate={{ scale: [1, 1.1, 1], opacity: [0.4, 0.8, 0.4] }} 
+      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}
+    >
+      <div style={{ position: 'relative', width: '60px', height: '60px' }}>
+        <div style={{ position: 'absolute', width: '100%', height: '100%', border: '2px solid rgba(0,242,255,0.1)', borderRadius: '50%' }} />
+        <motion.div 
+          animate={{ rotate: 360 }} 
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          style={{ position: 'absolute', width: '100%', height: '100%', border: '2px solid transparent', borderTopColor: 'var(--accent-cyan)', borderRadius: '50%' }} 
+        />
+      </div>
+      <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', color: 'rgba(255,255,255,0.3)' }}>Syncing Core...</span>
+    </motion.div>
+  </div>
+);
 
 
 function App() {
@@ -65,12 +92,7 @@ function App() {
   const finance = useFinanceData(user?.uid);
   const { data, exportJSON, resetData } = finance;
 
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const isMobile = useIsMobile();
 
   const mainRef = React.useRef(null);
   useEffect(() => { if (mainRef.current) mainRef.current.scrollTop = 0; }, [activeTab]);
@@ -192,8 +214,10 @@ function App() {
           marginBottom: isMobile ? '70px' : 0, display: 'flex', flexDirection: 'column', scrollBehavior: 'auto'
         }}>
         <AnimatePresence mode="wait">
-          <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2, ease: "easeOut" }} style={{ width: '100%', flex: 1, display: 'flex', flexDirection: 'column' }}>
-            {renderContent()}
+          <motion.div key={activeTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.15, ease: "easeOut" }} style={{ width: '100%', flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <Suspense fallback={<PageLoader />}>
+              {renderContent()}
+            </Suspense>
           </motion.div>
         </AnimatePresence>
       </main>
