@@ -185,8 +185,9 @@ const Settings = ({ user, data, updateSettings, categories, addCategory, exportJ
         <form onSubmit={handleAddCategory} style={{ display: 'flex', gap: '10px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 100px' }}>
             <label style={LABEL}>Category Type</label>
-            <select value={newCategory.type} onChange={e => setNewCat(p => ({ ...p, type: e.target.value }))} style={{ ...INPUT }}>
-              <option value="expense">Expense</option>
+            <select value={newCategory.type === 'expense' ? 'expense_need' : newCategory.type} onChange={e => setNewCat(p => ({ ...p, type: e.target.value }))} style={{ ...INPUT }}>
+              <option value="expense_need">Expense (Need)</option>
+              <option value="expense_want">Expense (Want)</option>
               <option value="income">Income</option>
             </select>
           </div>

@@ -30,6 +30,8 @@ const INITIAL_DATA = {
   categories: {
     income: ['Salary', 'Freelance', 'Investments', 'Business', 'Gift', 'Side Hustle', 'Rental Income', 'Bonus', 'Cash'],
     expense: ['Rent', 'Groceries', 'Utilities', 'Dining', 'Transport', 'Entertainment', 'Healthcare', 'Shopping', 'Education', 'Subscriptions', 'Insurance', 'Fuel', 'Personal Care', 'Gifts', 'Misc'],
+    needs: ['Rent', 'Groceries', 'Utilities', 'Transport', 'Healthcare', 'Education', 'Insurance', 'Fuel'],
+    wants: ['Dining', 'Entertainment', 'Shopping', 'Subscriptions', 'Personal Care', 'Gifts', 'Misc'],
   },
   userName: 'User',
   currency: '₹',
@@ -51,6 +53,8 @@ export const useFinanceData = (uid) => {
         const mergedCategories = {
           income: [...new Set([...(INITIAL_DATA.categories.income || []), ...(settings.categories?.income || [])])],
           expense: [...new Set([...(INITIAL_DATA.categories.expense || []), ...(settings.categories?.expense || [])])],
+          needs: [...new Set([...(INITIAL_DATA.categories.needs || []), ...(settings.categories?.needs || [])])],
+          wants: [...new Set([...(INITIAL_DATA.categories.wants || []), ...(settings.categories?.wants || [])])]
         };
         setData(prev => ({ ...prev, ...settings, categories: mergedCategories }));
       } else {
@@ -202,7 +206,10 @@ export const useFinanceData = (uid) => {
 
   const addCategory = useCallback(async (type, name) => {
     if (!uid) return;
-    const newCategories = { ...data.categories, [type]: [...data.categories[type], name] };
+    const baseType = type.startsWith('expense') ? 'expense' : 'income';
+    const newCategories = { ...data.categories, [baseType]: [...data.categories[baseType], name] };
+    if (type === 'expense_need') newCategories.needs = [...(data.categories.needs || []), name];
+    if (type === 'expense_want') newCategories.wants = [...(data.categories.wants || []), name];
     await updateDoc(doc(db, 'users', uid), { categories: newCategories });
   }, [uid, data.categories]);
 
@@ -292,8 +299,8 @@ export const useFinanceData = (uid) => {
     const now = new Date();
     const monthStart = startOfMonth(now);
     const monthEnd = endOfMonth(now);
-    const needsCategories = ['Rent', 'Groceries', 'Utilities', 'Transport', 'Healthcare', 'Education', 'Insurance', 'Fuel'];
-    const wantsCategories = ['Dining', 'Entertainment', 'Shopping', 'Subscriptions', 'Personal Care', 'Gifts', 'Misc'];
+    const needsCategories = data.categories?.needs || INITIAL_DATA.categories.needs;
+    const wantsCategories = data.categories?.wants || INITIAL_DATA.categories.wants;
     let spentNeeds = 0;
     let spentWants = 0;
     data.transactions.forEach(t => {
