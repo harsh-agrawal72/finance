@@ -63,7 +63,7 @@ const BudgetProgress = memo(({ title, current, target, suggested, icon: Icon, co
               </button>
             </div>
           )}
-          <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 600, background: 'rgba(255,255,255,0.03)', padding: '4px 10px', borderRadius: '8px' }}>{currency}{current.toLocaleString()} saved</span>
+          <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 600, background: 'rgba(255,255,255,0.03)', padding: '4px 10px', borderRadius: '8px' }}>{currency}{current.toLocaleString()} {isInverse ? 'saved' : 'spent'}</span>
         </div>
       </div>
 

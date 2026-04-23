@@ -2,6 +2,7 @@ import React, { useState, memo, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Plus, Trash2, Repeat, Download, ArrowUpRight, ArrowDownRight, Edit2, Check } from 'lucide-react';
 import { useIsMobile } from '../../hooks/useMediaQuery';
+import { parseISO, isSameMonth, isSameWeek } from 'date-fns';
 
 const COLORS = { income: 'var(--accent-emerald)', expense: 'var(--danger)' };
 
@@ -104,13 +105,15 @@ const TransactionManager = ({ transactions, addTransaction, deleteTransaction, e
   const [searchTerm,     setSearchTerm]     = useState('');
   const [filterType,     setFilterType]     = useState('all');
   const [filterCategory, setFilterCategory] = useState('all');
+  const [filterTime,     setFilterTime]     = useState('all');
   const [isAdding,       setIsAdding]       = useState(false);
   const [editingId,      setEditingId]      = useState(null);
   const [sortConfig,     setSortConfig]     = useState({ key: 'date', direction: 'desc' });
   const [formData,       setFormData]       = useState(BLANK);
   const [editData,       setEditData]       = useState(null);
   const [showSuccess,    setShowSuccess]    = useState(false);
-
+  const [currentPage,    setCurrentPage]    = useState(1);
+  const itemsPerPage = 10;
 
   // ── Stable handlers (no inline arrows passed to FormRow) ──────────────────
   const handleSubmit = useCallback((e) => {
@@ -163,10 +166,26 @@ const TransactionManager = ({ transactions, addTransaction, deleteTransaction, e
   const allCategories = useMemo(() => [...(categories?.income || []), ...(categories?.expense || [])], [categories]);
 
   const filtered = useMemo(() => {
+    const now = new Date();
     return transactions
       .filter(t => {
         const s = searchTerm.toLowerCase();
-        return (t.description.toLowerCase().includes(s) || t.category.toLowerCase().includes(s))
+        let timeMatch = true;
+        if (filterTime !== 'all') {
+          try {
+            const dateObj = parseISO(t.date);
+            if (filterTime === 'this_month') {
+              timeMatch = isSameMonth(dateObj, now);
+            } else if (filterTime === 'this_week') {
+              timeMatch = isSameWeek(dateObj, now, { weekStartsOn: 1 }); // Monday start
+            }
+          } catch {
+            timeMatch = false;
+          }
+        }
+
+        return timeMatch
+          && (t.description.toLowerCase().includes(s) || t.category.toLowerCase().includes(s))
           && (filterType === 'all' || t.type === filterType)
           && (filterCategory === 'all' || t.category === filterCategory);
       })
@@ -183,6 +202,14 @@ const TransactionManager = ({ transactions, addTransaction, deleteTransaction, e
     const expense = filtered.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
     return { totalIncome: income, totalExpense: expense };
   }, [filtered]);
+
+  React.useEffect(() => setCurrentPage(1), [searchTerm, filterType, filterCategory, filterTime, sortConfig]);
+
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const displayedTransactions = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filtered.slice(start, start + itemsPerPage);
+  }, [filtered, currentPage]);
 
   // ── JSX ───────────────────────────────────────────────────────────────────
   return (
@@ -254,6 +281,12 @@ const TransactionManager = ({ transactions, addTransaction, deleteTransaction, e
               style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', fontWeight: 500, width: '100%', outline: 'none' }} />
           </div>
           <div style={{ display: 'flex', gap: '10px', width: isMobile ? '100%' : 'auto' }}>
+            <select value={filterTime} onChange={e => setFilterTime(e.target.value)}
+              style={{ flex: 1, padding: '10px 12px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', borderRadius: '11px', fontWeight: 600, cursor: 'pointer' }}>
+              <option value="all">Lifetime</option>
+              <option value="this_month">This Month</option>
+              <option value="this_week">This Week</option>
+            </select>
             <select value={filterType} onChange={e => setFilterType(e.target.value)}
               style={{ flex: 1, padding: '10px 12px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', borderRadius: '11px', fontWeight: 600, cursor: 'pointer' }}>
               <option value="all">All Types</option>
@@ -287,7 +320,7 @@ const TransactionManager = ({ transactions, addTransaction, deleteTransaction, e
 
         {/* Rows */}
         <div>
-          {filtered.map((t, i) => (
+          {displayedTransactions.map((t, i) => (
             <div key={t.id}>
               {editingId === t.id ? (
                 <div style={{ padding: '16px 22px', borderBottom: '1px solid var(--glass-border)', background: 'rgba(0,255,170,0.02)' }}>
@@ -323,6 +356,7 @@ const TransactionManager = ({ transactions, addTransaction, deleteTransaction, e
                     </div>
                     <div>
                       <p style={{ fontWeight: 700, fontSize: '15px', color: 'var(--text-primary)' }}>{t.description}</p>
+                      {t.note && <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px', fontStyle: 'italic' }}>Note: {t.note}</p>}
                       <div style={{ display: 'flex', gap: '7px', marginTop: '3px', alignItems: 'center' }}>
                         <span style={{ padding: '2px 8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', fontSize: '10px', fontWeight: 700, color: 'var(--text-secondary)' }}>{t.category}</span>
                         {t.recurring !== 'none' && <span style={{ fontSize: '10px', color: 'var(--accent-cyan)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '3px', textTransform: 'uppercase' }}><Repeat size={9} /> {t.recurring}</span>}
@@ -363,6 +397,42 @@ const TransactionManager = ({ transactions, addTransaction, deleteTransaction, e
             <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
               <Search size={38} style={{ margin: '0 auto 14px', opacity: 0.3 }} />
               <p style={{ fontWeight: 600 }}>{transactions.length === 0 ? 'No transactions yet. Click "New Entry" to add one.' : 'No transactions match your filters.'}</p>
+            </div>
+          )}
+
+          {totalPages > 1 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', padding: '16px 22px', borderTop: '1px solid var(--glass-border)' }}>
+              <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+                Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filtered.length)} of {filtered.length} entries
+              </span>
+              <div style={{ display: 'flex', gap: '6px' }}>
+                <button 
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  style={{ padding: '6px 14px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', color: currentPage === 1 ? 'var(--text-muted)' : 'var(--text-primary)', borderRadius: '8px', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', fontSize: '13px', fontWeight: 600 }}>
+                  Previous
+                </button>
+                <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter(page => page === 1 || page === totalPages || Math.abs(currentPage - page) <= 1)
+                    .map((page, index, array) => (
+                      <React.Fragment key={page}>
+                        {index > 0 && array[index - 1] !== page - 1 && <span style={{ color: 'var(--text-muted)', margin: '0 4px' }}>...</span>}
+                        <button 
+                          onClick={() => setCurrentPage(page)}
+                          style={{ width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: currentPage === page ? 'var(--accent-cyan)' : 'transparent', color: currentPage === page ? '#05070a' : 'var(--text-secondary)', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
+                          {page}
+                        </button>
+                      </React.Fragment>
+                  ))}
+                </div>
+                <button 
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  style={{ padding: '6px 14px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', color: currentPage === totalPages ? 'var(--text-muted)' : 'var(--text-primary)', borderRadius: '8px', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', fontSize: '13px', fontWeight: 600 }}>
+                  Next
+                </button>
+              </div>
             </div>
           )}
         </div>

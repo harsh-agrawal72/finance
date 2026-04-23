@@ -28,7 +28,7 @@ const INITIAL_DATA = {
   assets: [],
   liabilities: [],
   categories: {
-    income: ['Salary', 'Freelance', 'Investments', 'Business', 'Gift', 'Side Hustle', 'Rental Income', 'Bonus'],
+    income: ['Salary', 'Freelance', 'Investments', 'Business', 'Gift', 'Side Hustle', 'Rental Income', 'Bonus', 'Cash'],
     expense: ['Rent', 'Groceries', 'Utilities', 'Dining', 'Transport', 'Entertainment', 'Healthcare', 'Shopping', 'Education', 'Subscriptions', 'Insurance', 'Fuel', 'Personal Care', 'Gifts', 'Misc'],
   },
   userName: 'User',
@@ -48,7 +48,11 @@ export const useFinanceData = (uid) => {
     const unsubSettings = onSnapshot(settingsRef, (docSnap) => {
       if (docSnap.exists()) {
         const settings = docSnap.data();
-        setData(prev => ({ ...prev, ...settings }));
+        const mergedCategories = {
+          income: [...new Set([...(INITIAL_DATA.categories.income || []), ...(settings.categories?.income || [])])],
+          expense: [...new Set([...(INITIAL_DATA.categories.expense || []), ...(settings.categories?.expense || [])])],
+        };
+        setData(prev => ({ ...prev, ...settings, categories: mergedCategories }));
       } else {
         // Initialize new user document
         setDoc(settingsRef, {

@@ -111,6 +111,14 @@ const Dashboard = ({ userName, totals, healthScore, insights, recentTransactions
                   </select>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Category</label>
+                  <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))} required>
+                    {(categories?.[form.type] || (form.type === 'income' ? ['Salary'] : ['Groceries'])).map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Amount ({currency})</label>
                   <input type="number" placeholder={`${currency}0`} value={form.amount} onChange={e => setForm(p => ({ ...p, amount: e.target.value }))} required min="0" />
                 </div>
